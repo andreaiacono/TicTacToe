@@ -1,7 +1,8 @@
 package me.andreaiacono.tictactoe
 
 /**
- * A state represent the tic-tac-toe grid in a certain moment of the game.
+ * A state represent a specific moment during the game. A move applied to a state
+ * generates a new state.
  */
 class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(size, { ' ' }) })) {
 
@@ -11,11 +12,24 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         }
     }
 
-    fun setMove(move: Move): State {
-        var newGrid = this.grid.clone()
-        // TODO horrible!
-        newGrid[move.row][move.col] = move.player.toString().toCharArray()[0]
+    fun applyMove(move: Move): State {
+        if (grid[move.row][move.col] != EMPTY) {
+            throw IllegalArgumentException("The actual state already contains the move [$move]")
+        }
+
+        var newGrid = clone(grid)
+        newGrid[move.row][move.col] = move.player.toString()[0]
         return State(size, newGrid)
+    }
+
+    private fun clone(grid: Array<CharArray>): Array<CharArray> {
+        var newGrid: Array<CharArray> = Array(size, { CharArray(size, { ' ' }) })
+        for (i in 0..size - 1) {
+            for (j in 0..size - 1) {
+                newGrid[i][j] = grid[i][j]
+            }
+        }
+        return newGrid
     }
 
     fun getPossibleMoves(player: Player): List<Move> {
@@ -39,17 +53,22 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
 
     fun hasWinner(): Boolean = getWinner() == null
 
-    // FIXME
     fun getWinner(): Player? {
 
+        // rows check
         for (i in 0..size - 1) {
-            if (grid[i].all { v -> v == grid[i][0] }) {
+            if (grid[i][0] != EMPTY && grid[i].all { it -> it == grid[i][0] }) {
                 return Player.valueOf(grid[i][0].toString())
             }
-            var found = true
-            for (j in 0..size - 1) {
-                if (grid[j][i] != grid[0][i]) {
+        }
+
+        // columns check
+        for (i in 0..size - 1) {
+            var found = true;
+            for (j in 1..size - 1) {
+                if (grid[0][i] == EMPTY || grid[j][i] != grid[0][i]) {
                     found = false
+                    break
                 }
             }
             if (found) {
@@ -57,27 +76,32 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
             }
         }
 
+        // top-left/bottom-right diagonal
         var found = true
-        for (i in 0..size - 1) {
-            for (j in 0..size - 1) {
-                if (grid[0][0] != grid[i][j]) {
-                    found = false
-                }
+        if (grid[0][0] == EMPTY) {
+            return null
+        }
+        for (i in 1..size - 1) {
+            if (grid[i][i] != grid[0][0]) {
+                found = false
             }
         }
         if (found) {
             return Player.valueOf(grid[0][0].toString())
         }
 
-        for (i in size - 1 downTo 0) {
-            for (j in 0..size - 1) {
-                if (grid[size-1][0] != grid[i][j]) {
-                    found = false
-                }
+        // top-right/bottom-left diagonal
+        found = true
+        if (grid[0][size - 1] == EMPTY) {
+            return null
+        }
+        for (i in 1..size - 1) {
+            if (grid[i][size - i] != grid[0][size - 1]) {
+                found = false
             }
         }
         if (found) {
-            return Player.valueOf(grid[size-1][0].toString())
+            return Player.valueOf(grid[0][size - 1].toString())
         }
 
         return null
