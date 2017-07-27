@@ -4,9 +4,7 @@ import me.andreaiacono.tictactoe.Player
 import me.andreaiacono.tictactoe.State
 import me.andreaiacono.tictactoe.fromCoordsToMove
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.fail
+import kotlin.test.*
 
 
 internal class StateTest {
@@ -57,6 +55,10 @@ internal class StateTest {
         state = State(3, grid)
         assertEquals(Player.X, state.getWinner())
 
+        grid = arrayOf(charArrayOf('X', ' ', 'O'), charArrayOf('X', 'X', 'O'), charArrayOf(' ', 'O', ' '))
+        state = State(3, grid)
+        assertNull(state.getWinner())
+
         grid = arrayOf(charArrayOf('X', ' ', 'X'), charArrayOf(' ', ' ', ' '), charArrayOf('X', ' ', 'X'))
         state = State(3, grid)
         assertNull(state.getWinner())
@@ -96,6 +98,29 @@ internal class StateTest {
             fail()
         } catch (e: IllegalArgumentException) {
         }
+
+    }
+
+    @Test fun `is the game finished?`() {
+        var grid = arrayOf(charArrayOf(' ', ' ', ' '), charArrayOf(' ', ' ', ' '), charArrayOf(' ', ' ', ' '))
+        var state = State(3, grid)
+        assertFalse(state.isFinished())
+
+        grid = arrayOf(charArrayOf('X', ' ', ' '), charArrayOf(' ', ' ', ' '), charArrayOf(' ', ' ', ' '))
+        state = State(3, grid)
+        assertFalse(state.isFinished())
+
+        grid = arrayOf(charArrayOf('O', ' ', ' '), charArrayOf(' ', ' ', ' '), charArrayOf(' ', ' ', ' '))
+        state = State(3, grid)
+        assertFalse(state.isFinished())
+
+        grid = arrayOf(charArrayOf('X', 'O', 'X'), charArrayOf('O', ' ', 'O'), charArrayOf('X', 'O', 'X'))
+        state = State(3, grid)
+        assertFalse(state.isFinished())
+
+        grid = arrayOf(charArrayOf('X', 'O', 'X'), charArrayOf('O', 'X', 'O'), charArrayOf('X', 'O', 'X'))
+        state = State(3, grid)
+        assertTrue(state.isFinished())
 
     }
 

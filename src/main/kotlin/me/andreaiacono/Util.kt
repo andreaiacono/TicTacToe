@@ -1,19 +1,15 @@
 package me.andreaiacono.tictactoe
 
 val EMPTY = ' '
-val X = 'X'
-val Y = 'Y'
-
 
 fun String.isNumeric(): Boolean {
     return this.matches("\\d+".toRegex())
 }
 
-fun minimax(actual: State, depth: Int, player: Player): Move {
+fun minimax(actual: State, depth: Int, player: Player, firstMovePlayer: Player): Move {
 
-    val moves = actual.getPossibleMoves(player)
+    val moves = actual.getPossibleMoves(firstMovePlayer)
 
-//    println("moves=$moves depth+$depth")
     // if it's the last move
     if (depth == actual.size * actual.size - 1) {
         val lastMove = moves.first()
@@ -31,7 +27,7 @@ fun minimax(actual: State, depth: Int, player: Player): Move {
             return move
         }
 
-        val nextMove = minimax(nextState, depth + 1, opponent)
+        val nextMove = minimax(nextState, depth + 1, opponent, firstMovePlayer)
         if (nextMove.score > bestMove.score) {
             bestMove = nextMove
         }
@@ -40,11 +36,15 @@ fun minimax(actual: State, depth: Int, player: Player): Move {
     return bestMove
 }
 
-fun fromCoordsToMove(move: String, player: Player): Move {
+fun fromCoordsToMove(move: String, player: Player, size: Int): Move {
     val trimmedMove = move.trim().toUpperCase()
     if (trimmedMove.length != 2 || !trimmedMove[1].isDigit() || !trimmedMove[0].isLetter()) {
         throw IllegalArgumentException("Illegal move [$trimmedMove]")
     }
-    // FIXME
-    return Move(trimmedMove[1].toInt() - 49, trimmedMove[0].toInt() - 65, player)
+    val row = trimmedMove[1].toInt() - 49
+    val col = trimmedMove[0].toInt() - 65
+    if (row >= size || col >= size) {
+        throw IllegalArgumentException("The move [$row, $col] is not inside the grid.")
+    }
+    return Move(row, col, player)
 }

@@ -51,7 +51,7 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         return if (getWinner() == player) 10 else -10
     }
 
-    fun hasWinner(): Boolean = getWinner() == null
+    fun hasWinner(): Boolean = getWinner() != null
 
     fun getWinner(): Player? {
 
@@ -84,6 +84,7 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         for (i in 1..size - 1) {
             if (grid[i][i] != grid[0][0]) {
                 found = false
+                break
             }
         }
         if (found) {
@@ -96,8 +97,9 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
             return null
         }
         for (i in 1..size - 1) {
-            if (grid[i][size - i] != grid[0][size - 1]) {
+            if (grid[i][size - 1 - i] != grid[0][size - 1]) {
                 found = false
+                break
             }
         }
         if (found) {
@@ -129,6 +131,15 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
             }
         }
 
-        return result
+        return result + "\n"
+    }
+
+    fun  isFinished(): Boolean {
+        for (i in 0..size - 1) {
+            if (grid[i].any { it -> it == EMPTY }) {
+                return false
+            }
+        }
+        return true
     }
 }

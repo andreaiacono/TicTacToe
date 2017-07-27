@@ -1,5 +1,7 @@
 package me.andreaiacono.tictactoe
 
+import me.andreaiacono.Game
+
 fun main(args : Array<String>) {
 
     val sizeParam = if (args.isEmpty()) "3" else args[0]
@@ -15,17 +17,7 @@ fun main(args : Array<String>) {
         return
     }
 
-    var state = State(4)
-
-    state = state.applyMove(fromCoordsToMove("A1", Player.X))
-    state = state.applyMove(fromCoordsToMove("B1", Player.X))
-//    grid.applyMove(fromCoordsToMove("C1", Player.X))
-    state = state.applyMove(fromCoordsToMove("B2", Player.X))
-    state = state.applyMove(fromCoordsToMove("C3", Player.X))
-    state = state.applyMove(fromCoordsToMove("B3", Player.O))
-
-//    minimax(state, 5, Player.X)
-
-    println(state.toString())
-    print(state.getWinner())
+    val game = Game(size)
+    game.start()
 }
+
