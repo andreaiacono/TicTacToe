@@ -17,7 +17,6 @@ fun main(args : Array<String>) {
         return
     }
 
-    val game = Game(size)
-    game.start()
+    Game(size).start()
 }
 

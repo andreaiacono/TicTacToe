@@ -92,9 +92,9 @@ internal class StateTest {
     @Test fun `cannot move twice on the same cell`() {
 
         var state = State(3)
-        state = state.applyMove(fromCoordsToMove("A1", Player.X))
+        state = state.applyMove(fromCoordsToMove("A1", Player.X, state.size))
         try {
-            state.applyMove(fromCoordsToMove("A1", Player.X))
+            state.applyMove(fromCoordsToMove("A1", Player.X, state.size))
             fail()
         } catch (e: IllegalArgumentException) {
         }
