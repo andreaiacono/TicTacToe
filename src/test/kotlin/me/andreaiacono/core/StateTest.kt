@@ -1,4 +1,4 @@
-package me.andreaiacono
+package me.andreaiacono.core
 
 import me.andreaiacono.tictactoe.Player
 import me.andreaiacono.tictactoe.State
@@ -10,7 +10,6 @@ import kotlin.test.*
 internal class StateTest {
 
     @Test fun `check winner`() {
-
         var grid = arrayOf(charArrayOf(' ', ' ', ' '), charArrayOf(' ', ' ', ' '), charArrayOf(' ', ' ', ' '))
         var state = State(3, grid)
         assertNull(state.getWinner())
@@ -86,19 +85,16 @@ internal class StateTest {
         grid = arrayOf(charArrayOf('X', 'O', 'O'), charArrayOf('X', 'O', ' '), charArrayOf('X', ' ', 'O'))
         state = State(3, grid)
         assertEquals(Player.X, state.getWinner())
-
     }
 
     @Test fun `cannot move twice on the same cell`() {
-
         var state = State(3)
-        state = state.applyMove(fromCoordsToMove("A1", Player.X, state.size))
+        state = state.applyMove(fromCoordsToMove("A1", state.size), Player.X)
         try {
-            state.applyMove(fromCoordsToMove("A1", Player.X, state.size))
+            state.applyMove(fromCoordsToMove("A1", state.size), Player.X)
             fail()
         } catch (e: IllegalArgumentException) {
         }
-
     }
 
     @Test fun `is the game finished?`() {
@@ -121,7 +117,5 @@ internal class StateTest {
         grid = arrayOf(charArrayOf('X', 'O', 'X'), charArrayOf('O', 'X', 'O'), charArrayOf('X', 'O', 'X'))
         state = State(3, grid)
         assertTrue(state.isFinished())
-
     }
-
 }

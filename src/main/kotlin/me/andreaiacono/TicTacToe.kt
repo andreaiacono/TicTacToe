@@ -6,8 +6,8 @@ fun main(args : Array<String>) {
 
     val sizeParam = if (args.isEmpty()) "3" else args[0]
 
-    if (!sizeParam.isNumeric()) {
-        println("Syntax: TicTacToe [SIZE]\n where SIZE is a number <= 9")
+    if (!sizeParam.isNumeric() || sizeParam.toInt() < 1) {
+        println("Syntax: TicTacToe [SIZE]\n where 1 <= SIZE <= 9")
         return
     }
 

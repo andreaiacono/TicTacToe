@@ -1,7 +1,7 @@
 package me.andreaiacono.tictactoe
 
 /**
- * A state represent a specific moment during the game. A move applied to a state
+ * A state represent the board in a specific moment of the game. A move applied to a state
  * generates a new state.
  */
 class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(size, { ' ' }) })) {
@@ -12,32 +12,33 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         }
     }
 
-    fun applyMove(move: Move): State {
+    fun applyMove(move: Move, player: Player): State {
         if (grid[move.row][move.col] != EMPTY) {
             throw IllegalArgumentException("The actual state already contains the move [$move]")
         }
-
-        var newGrid = clone(grid)
-        newGrid[move.row][move.col] = move.player.toString()[0]
+        val newGrid = clone(grid)
+        newGrid[move.row][move.col] = player.toString()[0]
         return State(size, newGrid)
     }
 
     private fun clone(grid: Array<CharArray>): Array<CharArray> {
-        var newGrid: Array<CharArray> = Array(size, { CharArray(size, { ' ' }) })
-        for (i in 0..size - 1) {
-            for (j in 0..size - 1) {
-                newGrid[i][j] = grid[i][j]
+        val newGrid: Array<CharArray> = Array(size, { CharArray(size, { ' ' }) })
+        grid.forEachIndexed {
+            rowIdx, row ->
+            row.forEachIndexed { colIdx, _ ->
+                newGrid[rowIdx][colIdx] = grid[rowIdx][colIdx]
             }
         }
         return newGrid
     }
 
-    fun getPossibleMoves(player: Player): List<Move> {
+    fun getPossibleMoves(): List<Move> {
         val moves: MutableList<Move> = mutableListOf()
-        for (i in 0..size - 1) {
-            for (j in 0..size - 1) {
-                if (grid[i][j] == EMPTY) {
-                    moves.add(Move(i, j, player))
+        grid.forEachIndexed {
+            rowIdx, row ->
+            row.forEachIndexed { colIdx, c ->
+                if (c == EMPTY) {
+                    moves.add(Move(rowIdx, colIdx))
                 }
             }
         }
@@ -45,13 +46,18 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
     }
 
     fun getScore(player: Player): Int {
-        if (getWinner() == null) {
-            return 0
+        when {
+            getWinner() == null -> return TIE
+            getWinner() == player -> return WIN
+            else -> return LOSE
         }
-        return if (getWinner() == player) 10 else -10
     }
 
+    fun getRemainingMovesNumber(): Int = grid.flatMap { it.asIterable() }.filter { it == EMPTY }.size
+    fun getPlayedMovesNumber(): Int = size - getRemainingMovesNumber()
     fun hasWinner(): Boolean = getWinner() != null
+    fun isFinished() = getRemainingMovesNumber() == 0
+    fun isGameOver() = isFinished() || hasWinner()
 
     fun getWinner(): Player? {
 
@@ -114,15 +120,15 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         var result = ""
 
         grid.forEachIndexed {
-            index, row ->
-            row.forEachIndexed { index, c ->
+            rowIdx, row ->
+            row.forEachIndexed { colIdx, c ->
                 result += c
-                if (index < size - 1) {
+                if (colIdx < size - 1) {
                     result += "|"
                 }
             }
 
-            if (index < size - 1) {
+            if (rowIdx < size - 1) {
                 result += "\n"
                 for (i in 1..size * 2 - 1) {
                     result += if (i % 2 == 0) '+' else '-'
@@ -132,14 +138,5 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         }
 
         return result + "\n"
-    }
-
-    fun  isFinished(): Boolean {
-        for (i in 0..size - 1) {
-            if (grid[i].any { it -> it == EMPTY }) {
-                return false
-            }
-        }
-        return true
     }
 }
