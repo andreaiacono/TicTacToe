@@ -14,7 +14,7 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
 
     fun applyMove(move: Move, player: Player): State {
         if (grid[move.row][move.col] != EMPTY) {
-            throw IllegalArgumentException("The actual state already contains the move [$move]")
+            throw IllegalArgumentException("The actual state already contains this move. ")
         }
         val newGrid = clone(grid)
         newGrid[move.row][move.col] = player.toString()[0]
