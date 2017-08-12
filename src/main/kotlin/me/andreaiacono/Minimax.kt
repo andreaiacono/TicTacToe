@@ -4,13 +4,21 @@ import me.andreaiacono.tictactoe.*
 
 data class ScoredMove(val score: Int, val move: Move)
 
-// for every possible move of this player, computes the best score and selects that move
-fun minimax(state: State, player: Player): Move {
 
+/**
+ * Returns the best move the specified player at this state
+ * @param state the state to find the best move for
+ * @param player the player to find the best move for
+ */
+fun minimax(state: State, player: Player, maxDepth: Int): Move {
     return state.getPossibleMoves()
             .map {
                 ScoredMove(
-                    minimax(state.applyMove(it, player), player.next(), false),
+                    // we pass to the minimax function:
+                    // - a new state obtained by applying this move
+                    // - the opponent of the calling player
+                    // - to minimize the score
+                    minimax(state.applyMove(it, player), player.next(), maxDepth, false),
                     it)
             }
             .maxBy { it.score }
@@ -19,27 +27,25 @@ fun minimax(state: State, player: Player): Move {
 
 
 /**
- * Computes the best move for the AI given the actual state.
-
+ * Computes the score for this state using the Minimax algorithm.
  * @param actualState the state of the game at this round
- * @param actualPlayer the player I'm moving for this round
- * @param isAiPlaying if this is round is played by the AI or by the user
+ * @param actualPlayer the player for this round
+ * @param depth the depth of recursive calls of minimax
+ * @param isMaximizing if this is round is to be maximized or minimized
  */
-fun minimax(actualState: State, actualPlayer: Player, isAiPlaying: Boolean): Int {
+fun minimax(actualState: State, actualPlayer: Player, depth: Int, isMaximizing: Boolean): Int {
 
-    if (actualState.isGameOver()) {
-        // even if the game is going to be tied or lost, we want the AI to last as much as possible
-        // thus adding the number of played moves
-        return actualState.getScore(actualPlayer) + actualState.getPlayedMovesNumber()
+    if (actualState.isGameOver() || depth == 0) {
+        return actualState.getScore(actualPlayer, isMaximizing)
     }
-    var bestScore: Int = if (isAiPlaying) Int.MIN_VALUE else Int.MAX_VALUE
+    var bestScore: Int = if (isMaximizing) Int.MIN_VALUE else Int.MAX_VALUE
     val moves = actualState.getPossibleMoves()
     for (move in moves) {
-        val moveScore = minimax(actualState.applyMove(move, actualPlayer), actualPlayer.next(), !(isAiPlaying))
-        bestScore = if (isAiPlaying)
-            Math.max(moveScore, bestScore)
-        else
-            Math.min(moveScore, bestScore)
+        val moveScore = minimax(actualState.applyMove(move, actualPlayer), actualPlayer.next(), depth-1, !(isMaximizing))
+        bestScore = if (isMaximizing)
+                        Math.max(moveScore, bestScore)
+                    else
+                        Math.min(moveScore, bestScore)
     }
     return bestScore
 }

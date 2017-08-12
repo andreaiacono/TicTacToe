@@ -54,6 +54,10 @@ internal class StateTest {
         state = State(3, grid)
         assertEquals(Player.X, state.getWinner())
 
+        grid = arrayOf(charArrayOf(' ', ' ', 'X'), charArrayOf('O', 'X', 'O'), charArrayOf('X', ' ', ' '))
+        state = State(3, grid)
+        assertEquals(Player.X, state.getWinner())
+
         grid = arrayOf(charArrayOf('X', ' ', 'O'), charArrayOf('X', 'X', 'O'), charArrayOf(' ', 'O', ' '))
         state = State(3, grid)
         assertNull(state.getWinner())

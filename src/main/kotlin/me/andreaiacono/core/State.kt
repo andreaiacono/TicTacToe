@@ -45,16 +45,19 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
         return moves
     }
 
-    fun getScore(player: Player): Int {
+    /**
+     * returns the score of this state based on the player who is requesting it
+     * and if that player has to be maximized or minimized
+     */
+    fun getScore(player: Player, isMaximizing: Boolean): Int {
         when {
             getWinner() == null -> return TIE
-            getWinner() == player -> return WIN
-            else -> return LOSE
+            getWinner() == player -> return if (isMaximizing) WIN else LOSE
+            else -> return if (isMaximizing) LOSE else WIN
         }
     }
 
     fun getRemainingMovesNumber(): Int = grid.flatMap { it.asIterable() }.filter { it == EMPTY }.size
-    fun getPlayedMovesNumber(): Int = size - getRemainingMovesNumber()
     fun hasWinner(): Boolean = getWinner() != null
     fun isFinished() = getRemainingMovesNumber() == 0
     fun isGameOver() = isFinished() || hasWinner()
@@ -84,11 +87,8 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
 
         // top-left/bottom-right diagonal
         var found = true
-        if (grid[0][0] == EMPTY) {
-            return null
-        }
         for (i in 1..size - 1) {
-            if (grid[i][i] != grid[0][0]) {
+            if (grid[0][0] == EMPTY || grid[i][i] != grid[0][0]) {
                 found = false
                 break
             }
@@ -99,11 +99,8 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
 
         // top-right/bottom-left diagonal
         found = true
-        if (grid[0][size - 1] == EMPTY) {
-            return null
-        }
         for (i in 1..size - 1) {
-            if (grid[i][size - 1 - i] != grid[0][size - 1]) {
+            if (grid[0][size - 1] == EMPTY || grid[i][size - 1 - i] != grid[0][size - 1]) {
                 found = false
                 break
             }
@@ -116,7 +113,6 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
     }
 
     override fun toString(): String {
-
         var result = ""
 
         grid.forEachIndexed {
@@ -136,7 +132,6 @@ class State(val size: Int, val grid: Array<CharArray> = Array(size, { CharArray(
                 result += "\n"
             }
         }
-
         return result + "\n"
     }
 }
